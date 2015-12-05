@@ -113,9 +113,9 @@ class Scout(Bee):
 		color = 'red'
 		return color
 
-def get_bees():
+def get_bees(numbees):
 	all_bees = []
-	amount_uninformed_bees = 40
+	amount_uninformed_bees = numbees
 	amount_scouts = int(amount_uninformed_bees * 0.05)
 
 	for i in range(amount_uninformed_bees):
@@ -135,7 +135,7 @@ def get_bees():
 	return all_bees
 
 def simulate(n):
-	all_bees = get_bees()
+	all_bees = get_bees(40)
 	
 	data = []
 	colors = []
