@@ -109,24 +109,39 @@ class Scout(Bee):
 		self.position = self.position + self.velocity * tstep
 		return self.position
 
+	def waggle(self):
+		pass
+
 	def get_color(self):
 		color = 'red'
 		return color
 
-def get_bees(numbees):
+def initialize_new_hives(numhives):
+	new_hive_positions = []
+	color_new_hive = []
+	color = 'orange'
+	for i in range(numhives):
+		new_hive_x = random.random() * 100
+		new_hive_y = random.random() * 100
+		new_hive_positions.append(np.array([new_hive_x, new_hive_y]))
+		color_new_hive.append(color)
+	return new_hive_positions, color_new_hive
+
+def get_bees(numbees, scouts_position):
 	all_bees = []
 	amount_uninformed_bees = numbees
-	amount_scouts = int(amount_uninformed_bees * 0.05)
+	#amount_scouts = int(amount_uninformed_bees * 0.05)
+	#amount_scouts = len(scouts_position)
 
 	for i in range(amount_uninformed_bees):
-		x = random.random() * 100
-		y = random.random() * 100
+		x = random.uniform(0.0, 0.2) * 100
+		y = random.uniform(0.0, 0.2) * 100
 		# z = random.random() * 100
 		all_bees.append(UninformedBee(np.array([x,y]), np.zeros(2)))
 
-	for i in range(amount_scouts):
-		x = 100.
-		y = 50.
+	for position in scouts_position:
+		x = position[0]
+		y = position[1]
 		xvel = -20.0
 		yvel = 0.0
 		# z = random.random() * 100
@@ -135,8 +150,10 @@ def get_bees(numbees):
 	return all_bees
 
 def simulate(n):
-	all_bees = get_bees(40)
-	
+	number_of_bees = 40
+	number_of_scouts = 2
+	new_hives, hives_colors = initialize_new_hives(number_of_scouts) 
+	all_bees = get_bees(number_of_bees, new_hives)
 	data = []
 	colors = []
 	for i in range(n):
@@ -145,9 +162,9 @@ def simulate(n):
 			positions.append(bee.determine_new_position(all_bees, 0.1))
 			colors.append(bee.get_color())
 		data.append(positions)
-	return data, colors
+	return data, colors, new_hives, hives_colors
 
-def plot(data, color):
+def plot(data, color, new_hives, hives_colors):
 	
 	plt.ion()
 	plt.show()
@@ -159,10 +176,15 @@ def plot(data, color):
 			plt.scatter(position[0], position[1], color=color[count])
 			plt.draw()
 
+		for count, position in enumerate(new_hives):
+			plt.scatter(position[0], position[1], color=hives_colors[count])
+			plt.draw()
+
 		plt.pause(0.1)
 		plt.clf()
 
 if __name__ == '__main__':
-	data, color = simulate(100)
-	plot(data, color)
+
+	data, color, new_hives, hives_colors = simulate(100)
+	plot(data, color, new_hives, hives_colors)
 
