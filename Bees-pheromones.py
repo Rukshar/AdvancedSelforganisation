@@ -29,14 +29,17 @@ class World(object):
         self.z=z
         self.pheromones = []
         self.bees = []
+
     def add_pheromone(self,pheromone):
         self.pheromones.append(pheromone)
         pass
+
     def check_next_state(self):
         #TODO: bee, check neigbors and decides on action
         #TODO: Pheromone, diffuses
         #TODO: if bee if all actions are possible (no collision) everything can be processed
         pass
+    
     def save_world_state(self):
         #TODO: this is so states are registered for later use, data analysis, graphs etc?
         pass
@@ -72,6 +75,9 @@ class Pheromone(object):
         # delete object
         pass
 
+def visualize():
+    # Some kind of visiualisation, can use plot and graphs. Or something else.
+    pass
 
 # def magnitude(x):
 #     return np.sqrt(x.dot(x))
