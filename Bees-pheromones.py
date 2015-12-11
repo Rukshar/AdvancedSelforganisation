@@ -29,7 +29,13 @@ class World(object):
         self.z=z
         self.pheromones = []
         self.bees = []
+        self.areas = [] #lijst van lijsten met [pos,concentratie]
         # lijst met posities die taken
+        # lijst met alle hokjes, en hun concentratie.
+    
+    def get_positions(self):
+        # alle bestaande posities berekenen en die in de lijst zetten met concentratie 0
+        pass
 
     def add_pheromone(self,pheromone):
         self.pheromones.append(pheromone)
@@ -44,6 +50,7 @@ class World(object):
     def save_world_state(self):
         #TODO: this is so states are registered for later use, data analysis, graphs etc?
         pass
+    
 
 class Pheromone(object):
     """
