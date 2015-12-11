@@ -48,7 +48,10 @@ class World(object):
         #TODO: Pheromone, diffuses
         #TODO: if bee if all actions are possible (no collision) everything can be processed
         pass
-
+    def do_next_state(self):
+        # TODO: after all states are checked and decided on, the world will change to the next world state
+        # This means time +1 and new pheromone concentrations, new bee positions etc.
+        pass
     def save_world_state(self):
         #TODO: this is so states are registered for later use, data analysis, graphs etc?
         pass
@@ -70,18 +73,19 @@ class Pheromone(object):
         self.color = "1.0" #some shade of grey 0.0 - 1.0
 
     def diffuse(self):
-        disappear(self) # first check if the particle has to disappear
+        self.disappear() # first check if the particle has to disappear
         
-        for all #ga alle hokjes in de wereld langs
-            for all #ga alle pheromonen centra langs
-                if (#de afstand van het hokje tot de pheromonen < diff_age)
-                    # concentratie van dit hokje wordt concentratie van de pheromoon * diff_rate ^ afstand)
-                    # change color naar lichter
+        # for all #ga alle hokjes in de wereld langs
+        #     for all #ga alle pheromonen centra langs
+        #         if (#de afstand van het hokje tot de pheromonen < diff_age)
+        #             # concentratie van dit hokje wordt concentratie van de pheromoon * diff_rate ^ afstand)
+        #             # change color naar lichter
         pass
 
     def disappear(self):
-        if (self.concentration < self.existence_treshold) # check if present concentration is too low to keep existing.
-            #self.delete??? # if so then pheromones should be removed from the world and free memory
+        if (self.concentration < self.existence_treshold):
+         pass# check if present concentration is too low to keep existing.
+        #self.delete??? # if so then pheromones should be removed from the world and free memory
         pass
 
 def visualize():
