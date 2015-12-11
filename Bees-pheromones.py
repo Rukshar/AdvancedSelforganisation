@@ -29,12 +29,13 @@ class World(object):
         self.z=z
         self.pheromones = []
         self.bees = []
-        self.areas = [] #lijst van lijsten met [pos,concentratie]
+        self.areas = self.get_positions() #lijst van lijsten met [pos,concentratie]
         # lijst met posities die taken
         # lijst met alle hokjes, en hun concentratie.
     
     def get_positions(self):
         # alle bestaande posities berekenen en die in de lijst zetten met concentratie 0
+        # return a list [[pos,concentratie],[pos,concentratie],....,[pos,concentratie]]
         pass
 
     def add_pheromone(self,pheromone):
