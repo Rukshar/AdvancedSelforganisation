@@ -57,21 +57,22 @@ class Pheromone(object):
         self.diff_rate=diff_rate
         self.concentration = 1.0 # start at 100% concentration
         self.existence_threshold = existence_threshold
+        self.diff_age = diff_age = 0
         self.color = "1.0" #some shade of grey 0.0 - 1.0
 
     def diffuse(self):
-        #TODO: first check if the particle has to disappear
-        #TODO: need a rule if there is already a pheromone as neighbor (higher concentration in some way)
-        #TODO: change concentration
-        #TODO: change color (lighter)
-        #TODO: if it should exist then create new pheromone objects in neighboring areas (copy of this one)
-        #      where the concentration is diff_rate * concentration (new and old pheromones.
+        disappear(self) # first check if the particle has to disappear
+        
+        for all #ga alle hokjes in de wereld langs
+            for all #ga alle pheromonen centra langs
+                if (#de afstand van het hokje tot de pheromonen < diff_age)
+                    # concentratie van dit hokje wordt concentratie van de pheromoon * diff_rate ^ afstand)
+                    # change color naar lichter
         pass
 
     def disappear(self):
-        #TODO: check if present concentration is too low to keep existing.
-        # if so then pheromones should be removed from the world and free memory
-        # delete object
+        if (self.concentration < self.existence_treshold) # check if present concentration is too low to keep existing.
+            #self.delete??? # if so then pheromones should be removed from the world and free memory
         pass
 
 def visualize():
