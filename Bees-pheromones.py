@@ -34,7 +34,7 @@ class World(object):
         # lijst met posities die taken
         # lijst met alle hokjes, en hun concentratie.
     
-    def get_positions(self):
+    def get_positions(self): #misschien beter get areas?
         # alle bestaande posities berekenen en die in de lijst zetten met concentratie 0
         # return a list [[pos,concentratie],[pos,concentratie],....,[pos,concentratie]]
         pass
@@ -47,8 +47,9 @@ class World(object):
         #TODO: bee, check neigbors and decides on action
         #TODO: Pheromone, diffuses
         #TODO: if bee if all actions are possible (no collision) everything can be processed
+        #returns a new state?
         pass
-    def do_next_state(self):
+    def do_next_state(self,state):
         # TODO: after all states are checked and decided on, the world will change to the next world state
         # This means time +1 and new pheromone concentrations, new bee positions etc.
         pass
