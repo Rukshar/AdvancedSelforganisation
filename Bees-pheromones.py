@@ -29,6 +29,7 @@ class World(object):
         self.z=z
         self.pheromones = []
         self.bees = []
+        # lijst met posities die taken
 
     def add_pheromone(self,pheromone):
         self.pheromones.append(pheromone)
@@ -39,7 +40,7 @@ class World(object):
         #TODO: Pheromone, diffuses
         #TODO: if bee if all actions are possible (no collision) everything can be processed
         pass
-    
+
     def save_world_state(self):
         #TODO: this is so states are registered for later use, data analysis, graphs etc?
         pass
@@ -49,12 +50,10 @@ class Pheromone(object):
     Scout bees can leave pheromones through their Naslav gland. The substance diffuses through the air.
     The concentration decreases when the substance diffuses.
     """
-    def __init__(self,x,y,z=0,diff_rate=0.5,existence_threshold=0.02):
+    def __init__(self,initial_pos,diff_rate=0.5,existence_threshold=0.02):
         # A pheromone has a position in space diffusion rate (how fast does the concentration decrease) and
         # a level of concentration
-        self.x=x
-        self.y=y
-        self.z=z
+        self.position = initial_pos #numpy array
         self.diff_rate=diff_rate
         self.concentration = 1.0 # start at 100% concentration
         self.existence_threshold = existence_threshold
