@@ -27,6 +27,7 @@ class World(object):
         self.x=x
         self.y=y
         self.z=z
+        self.time = 0
         self.pheromones = []
         self.bees = []
         # lijst met posities die taken
