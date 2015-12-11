@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 w_cohere = 0.3
 w_avoid = 0.3
 w_align = 0.3
+w_random = 0.3
+max_acceleration = 0.3
 visible_distance = 30.0
 minimum_distance = 15.0
 max_velocity = 1.0
@@ -69,7 +71,20 @@ class UninformedBee(Bee):
 		return (1/minimum_distance) * (1/len(min_neighbours)) * total
 
 	def _random(self):
-		pass
+		random_vector = np.random.random(2)
+		mag_random_vector = magnitude(random_vector)
+		labda = 2
+		beta = np.random.exponential(labda)
+
+		if beta < 0:
+			beta = 0
+		if beta > 1:
+			beta = 1
+
+		#beta = 0.2
+
+		return beta * (random_vector / mag_random_vector)
+
 
 	def determine_new_position(self, all_bees, tstep):
 		visible_neighbours = []
@@ -88,8 +103,16 @@ class UninformedBee(Bee):
 		cohere = self._cohere(visible_neighbours)
 		align = self._align(visible_neighbours)
 		avoid = self._avoid(min_neighbours)
-		new_velocity = w_cohere * cohere + w_avoid * avoid + w_align * align
-		self.velocity = weight * self.velocity + new_velocity
+		random = self._random()
+		new_velocity = w_cohere * cohere + w_avoid * avoid + w_align * align + w_random * random
+		
+		if magnitude(new_velocity) <= max_acceleration:
+			self.velocity = weight * self.velocity + new_velocity
+		else:
+			new_velocity = max_acceleration * (new_velocity / magnitude(new_velocity))
+			self.velocity = weight * self.velocity + new_velocity
+
+		#self.velocity = weight * self.velocity + new_velocity
 		self.position = self.position + self.velocity * tstep
 		
 		return self.position
@@ -109,39 +132,25 @@ class Scout(Bee):
 		self.position = self.position + self.velocity * tstep
 		return self.position
 
-	def waggle(self):
-		pass
-
 	def get_color(self):
 		color = 'red'
 		return color
 
-def initialize_new_hives(numhives):
-	new_hive_positions = []
-	color_new_hive = []
-	color = 'orange'
-	for i in range(numhives):
-		new_hive_x = random.random() * 100
-		new_hive_y = random.random() * 100
-		new_hive_positions.append(np.array([new_hive_x, new_hive_y]))
-		color_new_hive.append(color)
-	return new_hive_positions, color_new_hive
 
-def get_bees(numbees, scouts_position):
+def get_bees(numbees):
 	all_bees = []
 	amount_uninformed_bees = numbees
-	#amount_scouts = int(amount_uninformed_bees * 0.05)
-	#amount_scouts = len(scouts_position)
+	amount_scouts = int(amount_uninformed_bees * 0.05)
 
 	for i in range(amount_uninformed_bees):
-		x = random.uniform(0.0, 0.2) * 100
-		y = random.uniform(0.0, 0.2) * 100
+		x = random.random() * 10
+		y = random.random() * 10
 		# z = random.random() * 100
 		all_bees.append(UninformedBee(np.array([x,y]), np.zeros(2)))
 
-	for position in scouts_position:
-		x = position[0]
-		y = position[1]
+	for i in range(amount_scouts):
+		x = 5
+		y = 5
 		xvel = -20.0
 		yvel = 0.0
 		# z = random.random() * 100
@@ -151,9 +160,7 @@ def get_bees(numbees, scouts_position):
 
 def simulate(n):
 	number_of_bees = 40
-	number_of_scouts = 2
-	new_hives, hives_colors = initialize_new_hives(number_of_scouts) 
-	all_bees = get_bees(number_of_bees, new_hives)
+	all_bees = get_bees(number_of_bees)
 	data = []
 	colors = []
 	for i in range(n):
@@ -162,22 +169,19 @@ def simulate(n):
 			positions.append(bee.determine_new_position(all_bees, 0.1))
 			colors.append(bee.get_color())
 		data.append(positions)
-	return data, colors, new_hives, hives_colors
+	return data, colors
 
-def plot(data, color, new_hives, hives_colors):
+def plot(data, color):
 	
 	plt.ion()
 	plt.show()
+	plt.axis([0, 100, 0, 100])
 
 	for positions in data:
-		plt.axis([0, 100, 0, 100])
+		#plt.axis([0, 100, 0, 100])
 		
 		for count, position in enumerate(positions):
 			plt.scatter(position[0], position[1], color=color[count])
-			plt.draw()
-
-		for count, position in enumerate(new_hives):
-			plt.scatter(position[0], position[1], color=hives_colors[count])
 			plt.draw()
 
 		plt.pause(0.1)
@@ -185,6 +189,6 @@ def plot(data, color, new_hives, hives_colors):
 
 if __name__ == '__main__':
 
-	data, color, new_hives, hives_colors = simulate(100)
-	plot(data, color, new_hives, hives_colors)
+	data, color = simulate(100)
+	plot(data, color)
 
