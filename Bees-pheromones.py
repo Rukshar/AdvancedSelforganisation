@@ -46,6 +46,12 @@ class World(object):
     def check_next_state(self):
         #TODO: bee, check neigbors and decides on action
         #TODO: Pheromone, diffuses
+        # for all #ga alle hokjes in de wereld langs
+        #     for all #ga alle pheromonen centra langs
+        #         if (#de afstand van het hokje tot de pheromonen < diff_age)
+        #             # concentratie van dit hokje wordt concentratie van de pheromoon * diff_rate ^ afstand)
+        #             # change color naar lichter
+        
         #TODO: if bee if all actions are possible (no collision) everything can be processed
         #returns a new state?
         pass
@@ -70,17 +76,14 @@ class Pheromone(object):
         self.diff_rate=diff_rate
         self.concentration = 1.0 # start at 100% concentration
         self.existence_threshold = existence_threshold
-        self.diff_age = diff_age = 0
+        self.diff_age = 0
+        self.speed = 0.5
         self.color = "1.0" #some shade of grey 0.0 - 1.0
 
     def diffuse(self):
+        self.concentration = self.concentration * diff_rate
+        self.diff_age = self.diff_age + self.speed
         self.disappear() # first check if the particle has to disappear
-        
-        # for all #ga alle hokjes in de wereld langs
-        #     for all #ga alle pheromonen centra langs
-        #         if (#de afstand van het hokje tot de pheromonen < diff_age)
-        #             # concentratie van dit hokje wordt concentratie van de pheromoon * diff_rate ^ afstand)
-        #             # change color naar lichter
         pass
 
     def disappear(self):
