@@ -129,7 +129,23 @@ class Scout(Bee):
 	"""
 
 	def determine_new_position(self, all_bees, tstep):
-		self.position = self.position + self.velocity * tstep
+		front_of_swarm, back_of_swarm = get_ends_of_swarm(all_bees)
+		min_neighbours = []
+
+
+		for bee in all_bees:
+			if bee is self:
+				continue
+
+			if magnitude(self.position - bee.position) < minimum_distance:
+				min_neighbours.append(bee)
+
+		if len(min_neighbours) < 10:
+			self.position = self.position - self.velocity * tstep
+
+		else:
+			self.position = self.position + self.velocity * tstep
+
 		return self.position
 
 	def get_color(self):
@@ -141,6 +157,7 @@ def get_bees(numbees):
 	all_bees = []
 	amount_uninformed_bees = numbees
 	amount_scouts = int(amount_uninformed_bees * 0.05)
+	#amount_scouts = 10
 
 	for i in range(amount_uninformed_bees):
 		x = random.random() * 10
@@ -148,15 +165,28 @@ def get_bees(numbees):
 		# z = random.random() * 100
 		all_bees.append(UninformedBee(np.array([x,y]), np.zeros(2)))
 
+	front_of_swarm, back_of_swarm = get_ends_of_swarm(all_bees)
+
 	for i in range(amount_scouts):
-		x = 5
-		y = 5
-		xvel = -20.0
+		x = back_of_swarm
+		y = random.random() * 10
+		xvel = -10.0
 		yvel = 0.0
 		# z = random.random() * 100
 		all_bees.append(Scout(np.array([x,y]), np.array([xvel,yvel])))
 
 	return all_bees
+
+def get_ends_of_swarm(all_bees):
+	back_of_swarm = all_bees[0].position[0]
+	front_of_swarm = all_bees[0].position[0]
+	for bees in all_bees[1:]:
+		if bees.position[0] > back_of_swarm:
+			back_of_swarm = bees.position[0]
+		if bees.position[0] < front_of_swarm:
+			front_of_swarm = bees.position[0]
+	return front_of_swarm, back_of_swarm
+
 
 def simulate(n):
 	number_of_bees = 40
