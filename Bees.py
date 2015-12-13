@@ -71,17 +71,11 @@ class UninformedBee(Bee):
 		return (1/minimum_distance) * (1/len(min_neighbours)) * total
 
 	def _random(self):
-		random_vector = np.random.random(2)
+		random_vector = np.random.uniform(low = -1.0, high = 1.0, size = 2)
 		mag_random_vector = magnitude(random_vector)
-		labda = 2
-		beta = np.random.exponential(labda)
-
-		if beta < 0:
-			beta = 0
-		if beta > 1:
-			beta = 1
-
-		#beta = 0.2
+	
+		#In the paper they use a random point from the cdf but I don't think that's neceassary/useful
+		beta = random.random()
 
 		return beta * (random_vector / mag_random_vector)
 
@@ -104,6 +98,7 @@ class UninformedBee(Bee):
 		align = self._align(visible_neighbours)
 		avoid = self._avoid(min_neighbours)
 		random = self._random()
+
 		new_velocity = w_cohere * cohere + w_avoid * avoid + w_align * align + w_random * random
 		
 		if magnitude(new_velocity) <= max_acceleration:
@@ -128,6 +123,12 @@ class Scout(Bee):
 	other bees.
 	"""
 
+	def __init__(self, initial_position, initial_velocity):
+		Bee.__init__(self, initial_position, initial_velocity)
+
+		self.initial_position = initial_position
+
+
 	def determine_new_position(self, all_bees, tstep):
 		front_of_swarm, back_of_swarm = get_ends_of_swarm(all_bees)
 		min_neighbours = []
@@ -141,7 +142,7 @@ class Scout(Bee):
 				min_neighbours.append(bee)
 
 		if len(min_neighbours) < 10:
-			self.position = self.position - self.velocity * tstep
+			self.position = np.array([back_of_swarm, self.position[1]])
 
 		else:
 			self.position = self.position + self.velocity * tstep
@@ -170,7 +171,7 @@ def get_bees(numbees):
 	for i in range(amount_scouts):
 		x = back_of_swarm
 		y = random.random() * 10
-		xvel = -10.0
+		xvel = -5.0
 		yvel = 0.0
 		# z = random.random() * 100
 		all_bees.append(Scout(np.array([x,y]), np.array([xvel,yvel])))
@@ -205,10 +206,10 @@ def plot(data, color):
 	
 	plt.ion()
 	plt.show()
-	plt.axis([0, 100, 0, 100])
+	#plt.axis([0, 100, 0, 100])
 
 	for positions in data:
-		#plt.axis([0, 100, 0, 100])
+		plt.axis([-10, 20, 0, 20])
 		
 		for count, position in enumerate(positions):
 			plt.scatter(position[0], position[1], color=color[count])
