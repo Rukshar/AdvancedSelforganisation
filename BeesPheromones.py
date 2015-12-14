@@ -14,6 +14,9 @@ minimum_distance = 15.0
 max_velocity = 1.0
 weight = 0.8
 
+w_attract = 0.3
+decay = 0.1
+
 
 def magnitude(x):
 	return np.sqrt(x.dot(x))
@@ -77,11 +80,25 @@ class UninformedBee(Bee):
 		#In the paper they use a random point from the cdf but I don't think that's neceassary/useful
 		beta = random.random()
 
+		# _random = size of velocity * direction size
 		return beta * (random_vector / mag_random_vector)
 
+	def _attract(self, visible_pheromones):
 
-	def determine_new_position(self, all_bees, tstep):
+		if len(visible_pheromones) == 0:
+			return 0
+		
+		total = 0.0
+
+		for pheromone in visible_pheromones:
+			total += (pheromone.position - self.position) * pheromone.intensity
+
+		return (1/visible_distance) * total
+
+
+	def determine_new_position(self, all_bees, pheromones, tstep):
 		visible_neighbours = []
+		visible_pheromones = []
 		min_neighbours = []
 
 		for bee in all_bees:
@@ -94,12 +111,17 @@ class UninformedBee(Bee):
 				if magnitude(self.position - bee.position) < minimum_distance:
 					min_neighbours.append(bee)
 
+		for pheromone in pheromones:
+			if magnitude(self.position - pheromone.position) < visible_distance:
+				visible_pheromones.append(pheromone)
+
 		cohere = self._cohere(visible_neighbours)
 		align = self._align(visible_neighbours)
 		avoid = self._avoid(min_neighbours)
 		random = self._random()
+		attract = self._attract(visible_pheromones)
 
-		new_velocity = w_cohere * cohere + w_avoid * avoid + w_align * align + w_random * random
+		new_velocity = w_cohere * cohere + w_avoid * avoid + w_align * align + w_random * random + w_attract * attract
 		
 		if magnitude(new_velocity) <= max_acceleration:
 			self.velocity = weight * self.velocity + new_velocity
@@ -111,10 +133,6 @@ class UninformedBee(Bee):
 		self.position = self.position + self.velocity * tstep
 		
 		return self.position
-
-	def get_color(self):
-		color = 'blue'
-		return color
 
 class Scout(Bee):
 	"""
@@ -128,8 +146,18 @@ class Scout(Bee):
 
 		self.initial_position = initial_position
 
+		self.timer = 0.0
 
-	def determine_new_position(self, all_bees, tstep):
+	def excrete_pheromone(self, tstep):
+		if (self.timer < 1.0):
+			self.timer += tstep
+			return None
+		else:
+			self.timer = 0.0
+			return Pheromone(self.position)
+
+
+	def determine_new_position(self, all_bees, pheromones, tstep):
 		front_of_swarm, back_of_swarm = get_ends_of_swarm(all_bees)
 		min_neighbours = []
 
@@ -142,19 +170,25 @@ class Scout(Bee):
 				min_neighbours.append(bee)
 
 		if len(min_neighbours) < 10:
-			self.position = np.array([back_of_swarm, self.position[1]])
+			self.position = np.array([back_of_swarm, self.initial_position[1]])
 
 		else:
 			self.position = self.position + self.velocity * tstep
 
 		return self.position
 
-	def get_color(self):
-		color = 'red'
-		return color
+class Pheromone:
+	def __init__(self, position):
+		self.position = position
+		self.intensity = 1.0
+
+	def update(self, tstep):
+		self.intensity *= decay**tstep
 
 def get_bees(numbees):
-	all_bees = []
+	uninformed_bees = []
+	scout_bees = []
+
 	amount_uninformed_bees = numbees
 	amount_scouts = int(amount_uninformed_bees * 0.05)
 	#amount_scouts = 10
@@ -163,24 +197,25 @@ def get_bees(numbees):
 		x = random.random() * 10
 		y = random.random() * 10
 		# z = random.random() * 100
-		all_bees.append(UninformedBee(np.array([x,y]), np.zeros(2)))
+		uninformed_bees.append(UninformedBee(np.array([x,y]), np.zeros(2)))
 
-	front_of_swarm, back_of_swarm = get_ends_of_swarm(all_bees)
+	front_of_swarm, back_of_swarm = get_ends_of_swarm(uninformed_bees)
 
 	for i in range(amount_scouts):
 		x = back_of_swarm
 		y = random.random() * 10
-		xvel = -5.0
+		xvel = -1.0
 		yvel = 0.0
 		# z = random.random() * 100
-		all_bees.append(Scout(np.array([x,y]), np.array([xvel,yvel])))
+		scout_bees.append(Scout(np.array([x,y]), np.array([xvel,yvel])))
 
-	return all_bees
+	return uninformed_bees, scout_bees
 
-def get_ends_of_swarm(all_bees):
-	back_of_swarm = all_bees[0].position[0]
-	front_of_swarm = all_bees[0].position[0]
-	for bees in all_bees[1:]:
+
+def get_ends_of_swarm(uninformed_bees):
+	back_of_swarm = uninformed_bees[0].position[0]
+	front_of_swarm = uninformed_bees[0].position[0]
+	for bees in uninformed_bees[1:]:
 		if bees.position[0] > back_of_swarm:
 			back_of_swarm = bees.position[0]
 		if bees.position[0] < front_of_swarm:
@@ -189,36 +224,47 @@ def get_ends_of_swarm(all_bees):
 
 
 def simulate(n):
-	number_of_bees = 40
-	all_bees = get_bees(number_of_bees)
-	data = []
-	colors = []
-	for i in range(n):
-		positions = []
-		for bee in all_bees:
-			positions.append(bee.determine_new_position(all_bees, 0.1))
-			colors.append(bee.get_color())
-		data.append(positions)
-	return data, colors
+	number_of_bees = 100
+	timestep = 0.1
+	uninformed_bees, scout_bees = get_bees(number_of_bees)
+	all_bees = uninformed_bees + scout_bees
+	pheromones = []
 
-def plot(data, color):
-	
 	plt.ion()
 	plt.show()
-	#plt.axis([0, 100, 0, 100])
 
-	for positions in data:
-		plt.axis([-10, 20, 0, 20])
-		
-		for count, position in enumerate(positions):
-			plt.scatter(position[0], position[1], color=color[count])
-			plt.draw()
+	for i in range(n):
 
-		plt.pause(0.1)
+		#COMPUTATION
+		for bee in all_bees:
+			bee.determine_new_position(all_bees, pheromones, timestep)
+
+		for scout in scout_bees:
+			pheromone = scout.excrete_pheromone(timestep)
+			if pheromone:
+				pheromones.append(pheromone)
+
+		for pheromone in pheromones:
+			pheromone.update(timestep)
+			if pheromone.intensity < 0.01:
+				pheromones.remove(pheromone)
+
+		#VISUALIZE BEES
+		for uninformed_bee in uninformed_bees:
+			position = uninformed_bee.position
+			plt.scatter(position[0], position[1], color='blue')
+
+		for scout in scout_bees:
+			position = scout.position
+			plt.scatter(position[0], position[1], color='red')
+
+		for pheromone in pheromones:
+			position = pheromone.position
+			plt.scatter(position[0], position[1], color='black', alpha=pheromone.intensity)
+
+		plt.draw()
+		plt.pause(timestep)
 		plt.clf()
 
 if __name__ == '__main__':
-
-	data, color = simulate(100)
-	plot(data, color)
-
+	simulate(500)
