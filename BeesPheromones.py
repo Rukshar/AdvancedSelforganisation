@@ -243,7 +243,7 @@ def save_file(listname):
 def combine_list(lista,listb):
     new_list =[["TIME","DISTANCE"]]
     for i in range(len(lista)):
-        new_list.append([lista[i],listb[i]])
+        new_list.append([lista[i],round(listb[i],4)])
     return new_list
 
 
@@ -299,8 +299,9 @@ def simulate(n):
             plt.draw()
 
             plt.subplot(1, 2, 2)
-
-            distances_list.append(calculate_distance(hive_pos, swarm_centre))
+            d = calculate_distance(hive_pos, swarm_centre)
+            print d
+            distances_list.append(d)
             time_cummulative += timestep
             time_list.append(time_cummulative)
 
@@ -321,7 +322,8 @@ def simulate(n):
                 if user_input == 'y':
                     save_file( combine_list(time_list,distances_list) )
         print run
-        plt.show()
+    plt.show()
+    
 if __name__ == '__main__':
     simulate(2)
 
