@@ -235,7 +235,8 @@ def calculate_distance(pos_hive, pos_swarm):
 
 
 def save_file(listname):
-    with open('output.csv', "wb") as f:
+    name = raw_input("Give file name: ") + ".csv"
+    with open(name, "wb") as f:
         writer = csv.writer(f)
         writer.writerows(listname)
 
