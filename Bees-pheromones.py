@@ -93,7 +93,7 @@ class Pheromone(object):
         pass
 
 def visualize():
-    # Some kind of visiualisation, can use plot and graphs. Or something else.
+    # Some kind of visualisation, can use plot and graphs. Or something else.
     pass
 
 # def magnitude(x):
