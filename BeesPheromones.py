@@ -4,6 +4,7 @@ import random
 import time
 import csv
 import matplotlib.pyplot as plt
+import os
 
 w_cohere = 0.0  # 0.3 volgens paper het beste
 w_avoid = 0.3  # 0.3 volgens paper het beste
@@ -24,7 +25,6 @@ decay = 0.1
 def magnitude(x):
     return np.sqrt(x.dot(x))
 
-
 class Bee(object):
     """
     A bee has a starting position and a starting velocity, the swarm exists
@@ -34,7 +34,6 @@ class Bee(object):
     def __init__(self, initial_position, initial_velocity):
         self.position = initial_position
         self.velocity = initial_velocity
-
 
 class UninformedBee(Bee):
     """
@@ -139,7 +138,6 @@ class UninformedBee(Bee):
 
         return self.position
 
-
 class Scout(Bee):
     """
     Scout bees only have a new position, because they have the same velocity and
@@ -182,7 +180,6 @@ class Scout(Bee):
 
         return self.position
 
-
 class Pheromone:
     def __init__(self, position):
         self.position = position
@@ -218,7 +215,6 @@ def get_bees(numbees):
 
     return uninformed_bees, scout_bees
 
-
 def get_ends_of_swarm(uninformed_bees):
     back_of_swarm = uninformed_bees[0].position[0]
     front_of_swarm = uninformed_bees[0].position[0]
@@ -229,19 +225,27 @@ def get_ends_of_swarm(uninformed_bees):
             front_of_swarm = bees.position[0]
     return front_of_swarm, back_of_swarm
 
-
 def calculate_distance(pos_hive, pos_swarm):
     return magnitude(pos_hive - pos_swarm)
 
-
 def save_file(listname):
-    name = raw_input("Give file name: ") + ".csv"
-    with open(name, "wb") as f:
+
+    name = raw_input("Give file name: ")
+
+    path = "sim_files/" +name +"/"
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
+
+    with open(path + name +".csv", "wb") as f:
         writer = csv.writer(f)
         writer.writerows(listname)
+    plt.savefig(path + name +".png")
 
 def combine_list(lista,listb):
-    new_list =[["TIME","DISTANCE"]]
+    new_list =[["TIME","DISTANCE","w_cohere = "+ str(w_cohere),"w_avoid = " + str(w_avoid),"w_align = "+str(w_align),\
+                "w_random = " +str(w_random),"max_acceleration = "+str(max_acceleration),"visible_distance = "+str(visible_distance), \
+                "minimum_distance = " +str(minimum_distance), "max_velocity = " +str(max_velocity), "weight = "+ str(weight),\
+                "w_excretion_freq = " +str(w_excretion_freq), "w_attract = "+str(w_attract), "decay = " +str(decay)]]
     for i in range(len(lista)):
         new_list.append([lista[i],round(listb[i],4)])
     return new_list
@@ -265,6 +269,11 @@ def simulate(n):
 
     while(run):
         for i in length:
+            plt.clf()
+
+            manager = plt.get_current_fig_manager()
+            manager.window.showMaximized()
+
             swarm_centre = np.array([0.0, 0.0])
             plt.subplot(1, 2, 1)
             # COMPUTATION
@@ -300,15 +309,16 @@ def simulate(n):
 
             plt.subplot(1, 2, 2)
             d = calculate_distance(hive_pos, swarm_centre)
-            print d
+            # print d
             distances_list.append(d)
             time_cummulative += timestep
             time_list.append(time_cummulative)
 
             plt.plot(time_list, distances_list)
+            plt.ylim(0,45)
             plt.draw()
             plt.pause(timestep)
-            plt.clf()
+            # plt.clf()
             print i
             if (i==length[-1]):
 
@@ -323,7 +333,13 @@ def simulate(n):
                     save_file( combine_list(time_list,distances_list) )
         print run
     plt.show()
-    
+    return time_list,distances_list
 if __name__ == '__main__':
-    simulate(2)
+    tl,dl = simulate(2)
+    inp = raw_input("press enter key to get new plot")
+    plt.plot(tl, dl)
+    plt.ylim(45)
+    plt.show()
+
+
 
