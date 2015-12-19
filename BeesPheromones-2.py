@@ -6,9 +6,9 @@ import csv
 import matplotlib.pyplot as plt
 import os
 
-w_cohere = 0.3  # 0.3 volgens paper het beste
+w_cohere = 0.0  # 0.3 volgens paper het beste
 w_avoid = 0.3  # 0.3 volgens paper het beste
-w_align = 0.3  # 0.3 volgens paper het beste
+w_align = 0.0  # 0.3 volgens paper het beste
 w_random = 0.3  # 0.3 volgens paper het beste
 max_acceleration = 0.3
 visible_distance = 30.0  # 30.0
@@ -52,7 +52,6 @@ def get_xy_velocity(posa,posb,v):
     if m < scout_near:
         return vx * scout_velocity_decay*m/scout_near,vy * scout_velocity_decay*m/scout_near
     return vx,vy
-
 
 
 class Bee(object):
@@ -184,10 +183,12 @@ class Scout(Bee):
 
     def excrete_pheromone(self, tstep):
         if (self.timer < w_excretion_freq):
+            print 'yes'
             self.timer += tstep
             return None
         else:
             self.timer = 0.0
+            print 'excrete!'
             return Pheromone(self.position)
 
 
@@ -319,8 +320,8 @@ def simulate(n):
         for i in length:
             plt.clf()
 
-            manager = plt.get_current_fig_manager()
-            manager.window.showMaximized()
+            #manager = plt.get_current_fig_manager()
+            #manager.window.showMaximized()
 
             swarm_centre = np.array([0.0, 0.0])
             plt.subplot(2, 1, 1)
@@ -410,8 +411,10 @@ def simulate_auto(n,number_samples):
         for i in range(n):
             plt.clf()
 
-            manager = plt.get_current_fig_manager()
-            manager.window.showMaximized()
+            # manager = plt.get_current_fig_manager()
+            # manager.window.showMaximized()
+
+            front_of_swarm, back_of_swarm = get_ends_of_swarm(uninformed_bees)
 
             swarm_centre = np.array([0.0, 0.0])
             plt.subplot(1, 2, 1)
@@ -420,9 +423,15 @@ def simulate_auto(n,number_samples):
                 bee.determine_new_position(all_bees, pheromones, timestep)
 
             for scout in scout_bees:
-                pheromone = scout.excrete_pheromone(timestep)
-                if pheromone:
-                    pheromones.append(pheromone)
+                print np.floor(scout.position[0]), np.floor(front_of_swarm)
+                if np.floor(scout.position[0]) <= np.floor(front_of_swarm + random.randint(-3, 6)):
+                    pheromone = scout.excrete_pheromone(timestep)
+                    if pheromone:
+                        pheromones.append(pheromone)
+                if scout.position[0] == hive_pos[0]:
+                    pheromone = scout.excrete_pheromone(timestep)
+                    if pheromone:
+                        pheromones.append(pheromone)
 
             for pheromone in pheromones:
                 pheromone.update(timestep)
