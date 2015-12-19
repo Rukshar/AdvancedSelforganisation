@@ -6,9 +6,9 @@ import csv
 import matplotlib.pyplot as plt
 import os
 
-w_cohere = 0.0  # 0.3 volgens paper het beste
+w_cohere = 0.3  # 0.3 volgens paper het beste
 w_avoid = 0.3  # 0.3 volgens paper het beste
-w_align = 0.0  # 0.3 volgens paper het beste
+w_align = 0.3  # 0.3 volgens paper het beste
 w_random = 0.3  # 0.3 volgens paper het beste
 max_acceleration = 0.3
 visible_distance = 30.0  # 30.0
@@ -17,8 +17,8 @@ max_velocity = 1.0
 weight = 0.8
 
 # pheromone model
-w_excretion_freq = 0.4  # per hoeveel tijd er wordt uitgescheiden, moet een float zijn
-w_attract = 0.3
+w_excretion_freq = 99999999  # per hoeveel tijd er wordt uitgescheiden, moet een float zijn
+w_attract = 0.0
 decay = 0.1
 
 
@@ -188,7 +188,6 @@ class Pheromone:
     def update(self, tstep):
         self.intensity *= decay ** tstep
 
-
 def get_bees(numbees):
     uninformed_bees = []
     scout_bees = []
@@ -208,7 +207,7 @@ def get_bees(numbees):
     for i in range(amount_scouts):
         x = back_of_swarm + random.uniform(-1.5, 0.5)
         y = random.random() * 10
-        xvel = -1.1
+        xvel = -1.5
         yvel = 0.0
         # z = random.random() * 100
         scout_bees.append(Scout(np.array([x, y]), np.array([xvel, yvel])))
@@ -254,7 +253,7 @@ def combine_list(lista,listb):
 def simulate(n):
     hive_pos = np.array([-20.0, 5.0])
     time_list = []
-    time_cummulative = 0
+    time_cummulative = 0.0
     number_of_bees = 100
     timestep = 0.1
     uninformed_bees, scout_bees = get_bees(number_of_bees)
@@ -311,7 +310,7 @@ def simulate(n):
             d = calculate_distance(hive_pos, swarm_centre)
             # print d
             distances_list.append(d)
-            time_cummulative += timestep
+            time_cummulative = round(time_cummulative +timestep,1)
             time_list.append(time_cummulative)
 
             plt.plot(time_list, distances_list)
@@ -334,12 +333,10 @@ def simulate(n):
         print run
     plt.show()
     return time_list,distances_list
+
 if __name__ == '__main__':
     tl,dl = simulate(2)
-    inp = raw_input("press enter key to get new plot")
-    plt.plot(tl, dl)
-    plt.ylim(45)
-    plt.show()
+
 
 
 

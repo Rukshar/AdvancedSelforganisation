@@ -1,3 +1,0 @@
-TIME,DISTANCE,w_cohere = 0.0,w_avoid = 0.3,w_align = 0.0,w_random = 0.3,max_acceleration = 0.3,visible_distance = 30.0,minimum_distance = 15.0,max_velocity = 1.0,weight = 0.8,w_excretion_freq = 0.4,w_attract = 0.3,decay = 0.1
-0.1,25.1095
-0.2,25.1123

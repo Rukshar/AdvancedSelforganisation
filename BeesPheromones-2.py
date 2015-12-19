@@ -17,9 +17,9 @@ max_velocity = 1.0
 weight = 0.8
 
 # pheromone model
-w_excretion_freq = 9999999  # per hoeveel tijd er wordt uitgescheiden, moet een float zijn
+w_excretion_freq = 0.5  # per hoeveel tijd er wordt uitgescheiden, moet een float zijn
 w_attract = 0.3
-pheromone_decay = 0.5
+pheromone_decay = 0.1
 
 scout_velocity = -2.5
 scout_velocity_decay = 0.8
@@ -30,10 +30,11 @@ scout_minimum_distance = 10
 hive_pos = np.array([-20.0, 0.0])
 constant_names = ["w_cohere","w_avoid","w_align","w_random","max_acceleration","visible_distance","minimum_distance",\
                   "max_velocity", "weight","w_excretion_freq", "w_attract", "pheromone_decay", "scout_velocity","scout_velocity_decay",\
-                   "scout_near", "scout_min_neighbours","hive_pos"]
+                  "scout_near", "scout_min_neighbours","scout_minimum_distance","hive_pos"]
+
 constant_values = [w_cohere,w_avoid,w_align,w_random,max_acceleration,visible_distance,minimum_distance,max_velocity,\
                    weight,w_excretion_freq,w_attract, pheromone_decay,scout_velocity,scout_velocity_decay,scout_near,scout_min_neighbours,\
-                    hive_pos]
+                   scout_minimum_distance,hive_pos]
 
 def magnitude(pos):
     return np.sqrt(pos.dot(pos))
@@ -475,7 +476,7 @@ def simulate_auto(n,number_samples):
 
 
 if __name__ == '__main__':
-    simulate_auto(300,5)
+    simulate_auto(300,3)
 
 
 
